@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Tuition Classes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F2EC; --surface:#FFFFFF; --surface-2:#E7E9E0; --ink:#1A2138; --muted:#5A6077; --line:#D6D9CE;
+  --accent:#2D4FB8; --accent-ink:#FFFFFF; --accent-soft:#DFE6FA;
+  --good:#1E7457; --good-soft:#DAEEE5;
+  --amber:#8F5E00; --amber-soft:#FBEDCC; --red:#A82B38; --red-soft:#F8DDE0;
+  --rule:rgba(45,79,184,.13); --margin:rgba(168,43,56,.28);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121522; --surface:#1B1F31; --surface-2:#262B42; --ink:#E8EAF2; --muted:#A3A9C2; --line:#33384F;
+    --accent:#8DA8F5; --accent-ink:#0D1533; --accent-soft:#1E2A52;
+    --good:#55C29A; --good-soft:#173A2E;
+    --amber:#EDB653; --amber-soft:#3A2E14; --red:#F2838D; --red-soft:#3E1D24;
+    --rule:rgba(141,168,245,.12); --margin:rgba(242,131,141,.3); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121522; --surface:#1B1F31; --surface-2:#262B42; --ink:#E8EAF2; --muted:#A3A9C2; --line:#33384F;
+  --accent:#8DA8F5; --accent-ink:#0D1533; --accent-soft:#1E2A52;
+  --good:#55C29A; --good-soft:#173A2E;
+  --amber:#EDB653; --amber-soft:#3A2E14; --red:#F2838D; --red-soft:#3E1D24;
+  --rule:rgba(141,168,245,.12); --margin:rgba(242,131,141,.3); color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0;font-weight:700}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:0 18px 60px}
+
+/* hero: a page of ruled exercise-book paper with its red margin line */
+.hero{position:relative;padding:28px 0 22px 22px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent 0 25px,var(--rule) 25px 26px);pointer-events:none}
+.hero::after{content:"";position:absolute;top:0;bottom:0;left:8px;width:2px;background:var(--margin);pointer-events:none}
+.hero .app{position:relative;color:var(--muted);font-size:.95rem;display:flex;justify-content:space-between;gap:6px 14px;flex-wrap:wrap}
+.hero h1{position:relative;font-size:clamp(2.3rem,8vw,4rem);font-weight:800;letter-spacing:-.025em;margin:10px 0 6px;line-height:1}
+.hero .sub{position:relative;color:var(--muted)}
+.back{color:var(--muted);text-decoration:none;font-weight:700}
+.back:hover{color:var(--ink)}
+
+.syncbtn{border:0;background:transparent;padding:0;cursor:pointer;color:var(--muted);font-size:.92rem;display:inline-flex;align-items:center;gap:7px}
+.syncbtn:hover{color:var(--ink)}
+.syncbtn .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:none}
+.syncbtn[data-s="ok"] .dot{background:var(--good)}
+.syncbtn[data-s="saving"] .dot,.syncbtn[data-s="loading"] .dot{background:var(--amber)}
+.syncbtn[data-s="offline"] .dot,.syncbtn[data-s="error"] .dot{background:var(--red)}
+
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.cards.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:700px){.cards,.cards.two{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.card .lbl{color:var(--muted);font-size:.88rem}
+.card .big{font-family:var(--display);font-weight:700;font-size:1.35rem;line-height:1.2}
+.card .act{margin-top:auto;padding-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+.card .clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted);font-size:.92rem}
+.upl{display:flex;gap:10px;align-items:baseline;color:inherit;text-decoration:none;padding:4px 0;border-top:1px solid var(--line)}
+.upl:first-of-type{border-top:0}
+.upl .d{font-weight:700;min-width:6.5em}
+.upl .t{color:var(--muted);font-size:.92rem}
+.upl .n{margin-left:auto;font-weight:700;text-align:right}
+.upl:hover .n{text-decoration:underline}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.92rem;color:var(--ink);line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sm{padding:5px 10px;font-size:.85rem}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.danger{color:var(--red)}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.8rem;font-weight:700;white-space:nowrap;background:var(--surface-2);color:var(--muted)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.pill.bad{background:var(--red-soft);color:var(--red)}
+.pill.subj{background:var(--accent-soft);color:var(--accent)}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-top:6px;overflow-x:auto}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tabs button{border:0;background:transparent;padding:10px 14px;cursor:pointer;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.bar input{flex:1 1 220px;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 11px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;cursor:pointer;font-weight:700;font-size:.85rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stu{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--line);flex-wrap:wrap;color:inherit;text-decoration:none}
+.stu:first-child{border-top:0}
+.stu:hover{background:var(--surface-2)}
+.stu .nm{font-weight:700;min-width:170px;display:flex;flex-direction:column;line-height:1.3}
+.stu .nm small{font-weight:400;color:var(--muted);font-size:.86rem}
+.stu .info{flex:1;color:var(--muted);font-size:.92rem;min-width:150px}
+.more{margin-top:14px}
+
+/* class entries: collapsed by default, tap the row to open */
+.lhead{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.entry+.entry{margin-top:8px}
+.entry>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px}
+.entry>summary::-webkit-details-marker{display:none}
+.entry>summary:hover{background:var(--surface-2)}
+.entry[open]>summary{border-radius:12px 12px 0 0}
+.entry .tri{flex:none;width:0;height:0;border-left:8px solid var(--muted);border-top:5px solid transparent;border-bottom:5px solid transparent;transition:transform .15s}
+.entry[open] .tri{transform:rotate(90deg);border-left-color:var(--accent)}
+.entry .head{display:flex;flex-direction:column;min-width:0;flex:1}
+.entry .when{font-family:var(--display);font-weight:700;font-size:1.08rem}
+.entry .t{color:var(--muted);font-size:.9rem;font-weight:400;font-family:var(--body)}
+.entry .peek{color:var(--muted);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry .flags{display:flex;gap:4px;flex:none;flex-wrap:wrap;justify-content:flex-end}
+.entry .body{padding:4px 16px 12px 40px;border-top:1px solid var(--line)}
+@media (max-width:460px){.entry .body{padding-left:16px}.entry .flags{display:none}}
+.entry .txt{white-space:pre-wrap;margin-top:8px}
+.entry .sub{margin-top:8px;font-size:.93rem;white-space:pre-wrap}
+.entry .sub b{color:var(--muted)}
+.tools{display:flex;gap:4px;margin-top:8px;margin-left:-8px}
+
+/* study materials */
+.grp{font-size:1.05rem;margin:18px 0 8px;display:flex;align-items:baseline;gap:8px}
+.grp:first-of-type{margin-top:4px}
+.grp small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.86rem}
+.mat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.mat+.mat{margin-top:8px}
+.mat .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mat .ttl{font-weight:700;flex:1;min-width:0}
+.mat .ch{color:var(--muted);font-size:.9rem}
+.mat .nt{margin-top:6px;color:var(--muted);font-size:.92rem;white-space:pre-wrap}
+
+.files{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.files:empty{display:none}
+.file{display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;color:inherit;text-decoration:none;min-width:0;background:var(--surface)}
+a.file:hover{background:var(--surface-2);border-color:var(--muted)}
+.file .k{flex:none;font-size:.75rem;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--surface-2);color:var(--muted)}
+.file .fn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;font-size:.92rem}
+.file .sz{flex:none;color:var(--muted);font-size:.85rem}
+.file .x{font-size:1.25rem;padding:0 6px}
+.file.busy{border-style:dashed;color:var(--muted)}
+.linkrow{display:flex;gap:8px;flex-wrap:wrap}
+.linkrow[hidden]{display:none}
+.linkrow input{flex:1 1 180px;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px}
+
+.fee{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.fee:first-child{border-top:0}
+.fee .m{font-weight:700;min-width:140px;color:inherit;text-decoration:none}
+a.m:hover{text-decoration:underline}
+.fee .info{flex:1;color:var(--muted);font-size:.92rem;min-width:150px}
+.total{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px;color:var(--muted)}
+.total strong{color:var(--ink);font-family:var(--display);font-size:1.15rem}
+.monthnav{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.monthnav h3{font-size:1.15rem;min-width:9.5em;text-align:center}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.panel+.panel{margin-top:12px}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0}
+dt{color:var(--muted)} dd{margin:0;font-weight:700;text-align:right;white-space:pre-wrap}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:22px;color:var(--muted);text-align:center}
+.empty .btn{margin-top:10px}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+.err{color:var(--red);font-size:.92rem;min-height:1.2em}
+
+.scrim{position:fixed;inset:0;background:rgba(10,12,28,.5);z-index:50}
+.modal{position:fixed;z-index:51;left:50%;top:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 24px));max-height:calc(100% - 32px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal form{display:flex;flex-direction:column;min-height:0;flex:1}
+.modal header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+.modal header h2{font-size:1.15rem}
+.x{border:0;background:transparent;font-size:1.5rem;cursor:pointer;color:var(--muted);line-height:1;padding:2px 8px;border-radius:6px}
+.mbody{padding:16px 18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.modal footer{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld>span{font-size:.88rem;font-weight:700}
+.fld>span em{font-style:normal;font-weight:400;color:var(--muted)}
+.fld input,.fld select,.fld textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 11px;width:100%;min-width:0}
+.fld textarea{resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:460px){.row{grid-template-columns:1fr}}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:.9rem}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.hint{color:var(--muted);font-size:.86rem}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:10px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:80}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<datalist id="grades"><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option></datalist>
+<datalist id="boards"><option>CBSE</option><option>ICSE</option><option>ISC</option><option>State board</option></datalist>
+<script>
+"use strict";
+const KEY = 'my-tuition-v1';                 // local copy
+const CFG_KEY = 'my-tuition-sync-v1';        // web app URL + passcode for this device
+const OUT_KEY = 'my-tuition-outbox-v1';      // changes not yet saved to the sheet
+const SORT_KEY = 'my-tuition-class-sort';    // newest or oldest first, per device
+const SV_KEY = 'my-tuition-server-v';        // Apps Script version last seen
+const MAX_FILE = 10 * 1024 * 1024;
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WEEK = [1,2,3,4,5,6,0];                // Monday first in forms
+const METHODS = ['UPI','Cash','Bank Transfer'];
+const TYPES = ['Textbook','Notes','Worksheet','Question paper','Other'];
+const COMMON = ['Maths','Science','Physics','Chemistry','Biology','English','Hindi','Bengali','Social Science','History','Geography','Computer','EVS'];
+const EMPTY = () => ({ students:{}, classes:{}, materials:{}, fees:{} });
+let S = EMPTY();
+let homeTab = 'students', stuTab = 'classes', rq = '', cq = '', mq = '', subj = '', showPast = false, feeMonth = null;
+const openC = new Set();                     // class entries the person has opened
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+const p2 = n => String(n).padStart(2,'0');
+const iso = d => d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const today = () => iso(new Date());
+const thisMonth = () => today().slice(0,7);
+const parseD = s => new Date(s+'T00:00:00');
+const addDays = (s,n) => { const d=parseD(s); d.setDate(d.getDate()+n); return iso(d); };
+const fmtDate = s => s ? parseD(s).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+const fmtDay = s => s ? parseD(s).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}) : '—';
+const dayLabel = s => s===today() ? 'Today' : s===addDays(today(),1) ? 'Tomorrow' : fmtDay(s);
+const fmtMonth = ym => new Date(ym+'-01T00:00:00').toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+const fmtTime = t => t ? new Date('1970-01-01T'+t+':00').toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'}) : '';
+const inr = n => '₹' + Number(n||0).toLocaleString('en-IN');
+const nextMonth = ym => { const [y,m]=ym.split('-').map(Number); return m===12 ? (y+1)+'-01' : y+'-'+p2(m+1); };
+const prevMonth = ym => { const [y,m]=ym.split('-').map(Number); return m===1 ? (y-1)+'-12' : y+'-'+p2(m-1); };
+const readJSON = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e){ return null; } };
+const writeJSON = (k,v) => { try { v==null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+const normal = d => ({ students:d?.students||{}, classes:d?.classes||{}, materials:d?.materials||{}, fees:d?.fees||{} });
+const clone = o => JSON.parse(JSON.stringify(o));
+const uniq = a => { const seen=new Set(); return a.filter(x=>{ const k=String(x).toLowerCase(); if(!x||seen.has(k)) return false; seen.add(k); return true; }); };
+const joinList = a => a.length<2 ? a.join('') : a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+const natural = (a,b) => String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'});
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove('show'),2400); }
+let classSort = readJSON(SORT_KEY)==='old' ? 'old' : 'new';
+let serverV = Number(readJSON(SV_KEY)||0);
+const setServerV = v => { serverV = Number(v||0); writeJSON(SV_KEY, serverV); };
+
+/* ---------- local copy ---------- */
+function load(){ const r=readJSON(KEY); if (r) S=normal(r); }
+function save(){ writeJSON(KEY, S); }
+
+/* ---------- Google Sheet sync ---------- */
+let cfg = readJSON(CFG_KEY);                 // {url, key}
+let outbox = readJSON(OUT_KEY) || [];
+let sync = { state:'ok', msg:'' };
+let remote = { checked:false, err:'' };
+let seq = 0, flushP = null, refreshing = false;
+
+async function api(action, data={}, c=cfg){
+  let res;
+  try {
+    res = await fetch(c.url, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ ...data, action, key:c.key }) });
+  } catch(e){ throw new Error('offline'); }
+  let j;
+  try { j = await res.json(); }
+  catch(e){ const er=new Error('The web app didn’t send back data. Check it’s deployed with access for “Anyone”'); er.server=true; throw er; }
+  if (!j.ok){
+    const er=new Error(/^Unknown action/.test(j.error||'') ? 'Your Apps Script is out of date. Paste in the new Code.gs and deploy a new version' : (j.error||'Unknown error'));
+    er.server=true; throw er;
+  }
+  return j;
+}
+
+function push(action, data){
+  outbox.push(clone({ action, ...data }));
+  seq++; writeJSON(OUT_KEY, outbox); flush();
+}
+function flush(){ if (!flushP) flushP = doFlush().finally(()=>{ flushP=null; }); return flushP; }
+async function doFlush(){
+  if (!cfg) return false;
+  while (outbox.length){
+    setSync('saving');
+    try { await api(outbox[0].action, outbox[0]); }
+    catch(e){ setSync(e.server?'error':'offline', e.server?e.message:''); return false; }
+    outbox.shift(); writeJSON(OUT_KEY, outbox);
+  }
+  setSync('ok'); return true;
+}
+async function refresh(){
+  if (!cfg || refreshing) return;
+  refreshing = true;
+  try {
+    if (!(await flush())){ firstLoadFailed(); return; }
+    const s0 = seq; setSync('loading');
+    let j;
+    try { j = await api('load'); setServerV(j.version); }
+    catch(e){ setSync(e.server?'error':'offline', e.server?e.message:''); firstLoadFailed(); return; }
+    if (seq !== s0 || outbox.length){ flush(); return; }
+    const before = JSON.stringify(S);
+    S = normal(j.data); save();
+    const first = !remote.checked; remote = { checked:true, err:'' };
+    setSync('ok');
+    if (first || JSON.stringify(S) !== before) render();
+  } finally { refreshing = false; }
+}
+function firstLoadFailed(){
+  if (remote.checked) return;
+  remote.err = sync.state==='error' ? sync.msg : 'Can’t reach the Google Sheet. Check your internet connection.';
+  if (!stuList().length) render();
+}
+function syncText(){
+  const n = outbox.length, w = n+' change'+(n===1?'':'s')+' waiting';
+  switch (sync.state){
+    case 'saving': return 'Saving…';
+    case 'loading': return 'Checking for updates…';
+    case 'offline': return 'Offline, '+w;
+    case 'error': return 'Not saving to the sheet';
+    default: return n ? w : 'Saved to Google Sheet';
+  }
+}
+function setSync(state, msg=''){
+  sync = { state, msg };
+  const b = $('#sync');
+  if (b){ b.dataset.s = state; b.querySelector('span:last-child').textContent = syncText(); }
+  const p = $('#syncPanel'); if (p) p.innerHTML = syncPanelInner();
+}
+function syncPanelInner(){
+  let t = esc(syncText())+'.';
+  if (sync.state==='error') t += ' '+esc(sync.msg)+'.';
+  if (sync.state==='offline') t += ' They’ll be sent when you’re back online.';
+  return t;
+}
+
+/* ---------- derived ---------- */
+const stuList = () => Object.values(S.students).sort((a,b)=>String(a.name).localeCompare(String(b.name),'en',{sensitivity:'base'}));
+const classesOf = id => Object.values(S.classes).filter(c=>c.studentId===id).sort((a,b)=>(b.date+(b.time||'')).localeCompare(a.date+(a.time||'')));
+const matsOf = id => Object.values(S.materials).filter(m=>m.studentId===id)
+  .sort((a,b)=>natural(a.subject,b.subject) || natural(a.chapter,b.chapter) || TYPES.indexOf(a.type)-TYPES.indexOf(b.type) || natural(matTitle(a),matTitle(b)));
+const daysOf = st => (Array.isArray(st.days) ? st.days : String(st.days??'').split(',')).filter(x=>x!==''&&x!=null).map(Number);
+const subjectsOf = st => uniq(String(st.subjects||'').split(',').map(x=>x.trim()));
+const usedSubjects = st => uniq([...subjectsOf(st), ...classesOf(st.id).map(c=>c.subject), ...matsOf(st.id).map(m=>m.subject)].map(x=>String(x||'').trim()));
+const matTitle = m => m.title || (m.files&&m.files[0]&&m.files[0].name) || m.type || 'Material';
+const hasClassOn = (id,d) => Object.values(S.classes).some(c=>c.studentId===id && c.date===d);
+function nextClass(st){
+  if (!st || st.leftDate) return null;
+  const t = today(), days = daysOf(st);
+  if (st.next && st.next.date >= t && !hasClassOn(st.id, st.next.date)) return {...st.next, custom:true};
+  if (!days.length) return null;
+  for (let i=0;i<8;i++){ const d=addDays(t,i); if (days.includes(parseD(d).getDay()) && !hasClassOn(st.id,d)) return {date:d, time:st.time, custom:false}; }
+  return null;
+}
+const endMonth = st => { const t=thisMonth(); return st.leftDate && st.leftDate.slice(0,7)<t ? st.leftDate.slice(0,7) : t; };
+const inMonth = (st,m) => (st.joinDate||today()).slice(0,7)<=m && (!st.leftDate || st.leftDate.slice(0,7)>=m);
+function monthsOf(st){
+  const out=[]; let m=(st.joinDate||today()).slice(0,7); const end=endMonth(st);
+  while (m<=end && out.length<240){ out.push(m); m=nextMonth(m); }
+  return out.reverse();
+}
+const fk = (id,m) => id+'_'+m;
+function feeInfo(st,m){
+  const r=S.fees[fk(st.id,m)]||{}, due=Number(r.due ?? st.fee ?? 0), paid=Number(r.amount||0);
+  const status = paid>=due && due>0 ? 'Paid' : paid>0 ? 'Part paid' : 'Not paid';
+  return {...r, month:m, due, paid, bal:Math.max(0,due-paid), status};
+}
+const pendingOf = st => monthsOf(st).reduce((s,m)=>s+feeInfo(st,m).bal,0);
+const tone = s => s==='Paid'?'good':s==='Part paid'?'warn':'bad';
+const daysText = st => { const d=daysOf(st); return d.length===7 ? 'Every day' : joinList(WEEK.filter(x=>d.includes(x)).map(x=>SHORT[x])); };
+const usual = st => daysOf(st).length ? daysText(st)+(st.time?' at '+fmtTime(st.time):'') : 'No fixed days';
+const gradeLine = st => [st.grade, st.board].filter(Boolean).join(', ');
+
+/* ---------- attachments ---------- */
+const readB64 = file => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=()=>rej(new Error('read')); r.readAsDataURL(file); });
+const safeUrl = u => /^https?:\/\//i.test(u||'') ? u : '#';
+const kindOf = f => f.kind==='link' ? (/youtu\.?be/i.test(f.url)?'YouTube':'Link')
+  : /pdf/i.test(f.mime)?'PDF' : /^image/i.test(f.mime)?'Photo' : /^audio/i.test(f.mime)?'Audio' : /^video/i.test(f.mime)?'Video' : 'File';
+const fsize = n => !n ? '' : n<1048576 ? Math.max(1,Math.round(n/1024))+' KB' : (n/1048576).toFixed(1)+' MB';
+function linkName(u){ if (/youtu\.?be/i.test(u)) return 'YouTube video'; try { return new URL(u).hostname.replace(/^www\./,''); } catch(e){ return 'Link'; } }
+function fileRow(f, edit){
+  const inner = `<span class="k">${kindOf(f)}</span><span class="fn">${esc(f.name)}</span>${f.size?`<span class="sz">${fsize(f.size)}</span>`:''}`;
+  return edit ? `<div class="file">${inner}<button type="button" class="x" data-rm="${esc(f.id)}" aria-label="Remove ${esc(f.name)}">×</button></div>`
+    : `<a class="file" href="${esc(safeUrl(f.url))}" target="_blank" rel="noopener">${inner}</a>`;
+}
+const filesHTML = files => files&&files.length ? `<div class="files">${files.map(f=>fileRow(f)).join('')}</div>` : '';
+function attachHTML(label){
+  return `<div class="fld"><span>${label}</span>
+    ${serverV>=1 ? `<div class="files" id="flist"></div>
+    <div class="btns"><label class="btn sm" style="cursor:pointer">Attach file<input type="file" id="fpick" multiple hidden></label>
+      <button type="button" class="btn sm" id="linkbtn">Add a link</button></div>
+    <div class="linkrow" id="linkrow" hidden><input type="url" id="lurl" placeholder="Paste a YouTube or Drive link" aria-label="Link"><input id="lname" placeholder="Name (optional)" aria-label="Link name"><button type="button" class="btn sm primary" id="ladd">Add</button></div>
+    <p class="hint">Files go to the “My Tuition Files” folder in your Google Drive, up to 10 MB each. For a bigger textbook PDF, put it in Drive yourself and add its link.</p>`
+    : `<p class="hint">Connect to your Google Sheet to attach files and links.</p>`}</div>`;
+}
+/* Wires up the attach controls in the open form. Files uploaded and then cancelled are cleaned up. */
+function attachWire(st, orig){
+  let files = orig.slice(), fresh = [], up = [], gone = false;
+  const ctl = { files:()=>files, busy:()=>up.length>0,
+    cancel(){ gone=true; fresh.forEach(f=>push('delFile',{fileId:f.id})); },
+    commit(){ const keep=new Set(files.map(f=>f.id)); orig.concat(fresh).forEach(f=>{ if (f.kind==='drive' && !keep.has(f.id)) push('delFile',{fileId:f.id}); }); gone=true; return files; } };
+  if (!$('#flist')) return ctl;
+  const draw = () => { const l=$('#flist'); if (!l || gone) return;
+    l.innerHTML = files.map(f=>fileRow(f,true)).join('') + up.map(n=>`<div class="file busy"><span class="k">…</span><span class="fn">Uploading ${esc(n)}</span></div>`).join(''); };
+  draw();
+  $('#flist').onclick = e => { const b=e.target.closest('[data-rm]'); if (!b) return; files = files.filter(f=>f.id!==b.dataset.rm); draw(); };
+  $('#fpick').onchange = e => {
+    [...e.target.files].forEach(async file => {
+      if (file.size > MAX_FILE){ toast(file.name+' is over 10 MB. Add it to Drive and use “Add a link”.'); return; }
+      up.push(file.name); draw();
+      try {
+        const sj = ($('#mf [name="subject"]')||{}).value || '';
+        const j = await api('upload', {studentId:st.id, subject:sj.trim(), name:file.name, mime:file.type||'application/octet-stream', data:await readB64(file)});
+        if (gone){ push('delFile',{fileId:j.file.id}); return; }
+        files.push(j.file); fresh.push(j.file);
+      } catch(ex){ toast(ex.server ? ex.message : 'Couldn’t upload '+file.name+'. Check your internet connection.'); }
+      finally { up.splice(up.indexOf(file.name),1); draw(); }
+    });
+    e.target.value = '';
+  };
+  const row=$('#linkrow'), lu=$('#lurl'), ln=$('#lname');
+  $('#linkbtn').onclick = () => { row.hidden = false; lu.focus(); };
+  const addLink = () => {
+    const u = lu.value.trim();
+    if (!/^https?:\/\/\S+$/i.test(u)){ toast('Paste a full link starting with https://'); lu.focus(); return; }
+    files.push({id:uid(), kind:'link', name:ln.value.trim()||linkName(u), url:u});
+    lu.value=''; ln.value=''; row.hidden=true; draw();
+  };
+  $('#ladd').onclick = addLink;
+  [lu,ln].forEach(i=>i.onkeydown = e => { if (e.key==='Enter'){ e.preventDefault(); addLink(); } });
+  return ctl;
+}
+
+/* ---------- routing: #student-<id> opens a student ---------- */
+function route(){ const m=/^#student-([a-z0-9]+)$/.exec(location.hash); return m && S.students[m[1]] ? S.students[m[1]] : null; }
+window.addEventListener('hashchange', () => { stuTab='classes'; cq=''; mq=''; subj=''; openC.clear(); close(); render(); window.scrollTo(0,0); });
+
+/* ---------- modal ---------- */
+const fld = (name,label,val='',type='text',extra='') => `<label class="fld"><span>${label}</span><input name="${name}" type="${type}" value="${esc(val)}" ${extra}></label>`;
+const area = (name,label,val='',rows=3,ph='') => `<label class="fld"><span>${label}</span><textarea name="${name}" rows="${rows}" placeholder="${esc(ph)}">${esc(val)}</textarea></label>`;
+const subjList = st => `<datalist id="subjs">${uniq([...usedSubjects(st), ...COMMON]).map(x=>`<option>${esc(x)}</option>`).join('')}</datalist>`;
+let onCancel = null;   // runs when a form is closed without saving
+function openModal({title, body, ok='Save', onSave, left='', cancel=null}){
+  onCancel = cancel;
+  $('#modal-root').innerHTML = `<div class="scrim" data-act="close"></div><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><form id="mf" novalidate>
+    <header><h2 id="mt">${title}</h2><button type="button" class="x" data-act="close" aria-label="Close">×</button></header>
+    <div class="mbody">${body}</div>
+    <footer>${left}<span class="grow"></span><button type="button" class="btn" data-act="close">${onSave?'Cancel':'Close'}</button>${onSave?`<button class="btn primary" type="submit">${ok}</button>`:''}</footer></form></div>`;
+  document.body.classList.add('locked');
+  const f=$('#mf');
+  f.onsubmit = e => { e.preventDefault(); const fd=new FormData(f); if (onSave && onSave(Object.fromEntries(fd), fd)!==false){ onCancel=null; close(); } };
+  setTimeout(()=>{ const el=f.querySelector('.mbody input:not([type=checkbox]):not([type=radio]),.mbody textarea'); el&&el.focus(); },40);
+}
+function close(){ const c=onCancel; onCancel=null; $('#modal-root').innerHTML=''; document.body.classList.remove('locked'); c&&c(); }
+function confirmBox(msg, yes, fn){
+  openModal({title:'Are you sure?', body:`<p>${msg}</p>`, left:`<button type="button" class="btn danger" id="yes">${yes}</button>`});
+  $('#yes').onclick = () => { close(); fn(); };
+}
+document.addEventListener('keydown', e => { if (e.key==='Escape') close(); });
+
+/* ---------- forms ---------- */
+function putStudent(st){ S.students[st.id]=st; save(); push('putStudent', {student:st}); }
+
+function studentForm(st){
+  const last = stuList().slice(-1)[0];
+  const s = st || {name:'', grade:'', board:last?.board||'', school:'', subjects:'', phone:'', guardian:'', guardianPhone:'', joinDate:today(), fee:last?.fee||1500, days:[], time:last?.time||'17:00', notes:''};
+  const sd = daysOf(s);
+  openModal({ title: st?'Edit student':'Add a student', ok: st?'Save changes':'Add student',
+    body: `${fld('name','Student name',s.name)}
+      <div class="row">${fld('grade','Class',s.grade,'text','list="grades" placeholder="Class 8"')}${fld('board','Board <em>(optional)</em>',s.board,'text','list="boards"')}</div>
+      ${fld('school','School <em>(optional)</em>',s.school)}
+      <label class="fld"><span>Subjects you teach them</span><input name="subjects" value="${esc(s.subjects)}" placeholder="Maths, Science, English"><span class="hint" style="font-weight:400">Separate subjects with commas.</span></label>
+      <div class="row">${fld('guardian','Parent or guardian <em>(optional)</em>',s.guardian)}${fld('guardianPhone','Parent’s phone <em>(optional)</em>',s.guardianPhone,'tel')}</div>
+      ${fld('phone','Student’s phone <em>(optional)</em>',s.phone,'tel')}
+      <div class="row">${fld('joinDate','Joined on',s.joinDate,'date')}${fld('fee','Monthly fee (₹)',s.fee,'number','min="0" step="1" inputmode="numeric"')}</div>
+      <div class="fld"><span>Class days</span><div class="seg">${WEEK.map(i=>`<label><input type="checkbox" name="days" value="${i}" ${sd.includes(i)?'checked':''}>${SHORT[i]}</label>`).join('')}</div></div>
+      ${fld('time','Usual time',s.time,'time')}
+      ${area('notes','Notes <em>(optional)</em>',s.notes,3,'Weak in algebra. Exams in March.')}`,
+    onSave: (v, fd) => {
+      if (!v.name.trim()){ toast('Enter the student’s name'); return false; }
+      const rec = { id: st?.id || uid(), next: st?.next || null, leftDate: st?.leftDate || '', ...v,
+        name:v.name.trim(), grade:v.grade.trim(), board:v.board.trim(), school:v.school.trim(),
+        subjects: subjectsOf({subjects:v.subjects}).join(', '), fee:Number(v.fee||0), days: fd.getAll('days').map(Number) };
+      putStudent(rec);
+      if (st){ toast('Saved'); render(); }
+      else { toast(rec.name+' added'); location.hash='student-'+rec.id; }
+    }});
+}
+function classForm(st, c){
+  const nc = nextClass(st), prev = classesOf(st.id)[0];
+  const d = c || {id:uid(), studentId:st.id, date:today(), time:(nc && nc.date===today() ? nc.time : st.time) || '',
+    subject: subj || (subjectsOf(st).length===1 ? subjectsOf(st)[0] : prev?.subject) || '', chapter:'', did:'', homework:'', notes:'', files:[]};
+  let w;
+  openModal({ title: c?'Edit class':'Add a class for '+esc(st.name), ok: c?'Save changes':'Save class',
+    body: `${subjList(st)}<div class="row">${fld('date','Date',d.date,'date')}${fld('time','Time',d.time,'time')}</div>
+      <div class="row">${fld('subject','Subject',d.subject,'text','list="subjs" autocomplete="off"')}${fld('chapter','Chapter or topic <em>(optional)</em>',d.chapter,'text','placeholder="Ch 4, Linear equations"')}</div>
+      ${area('did','What we did',d.did,6,'Explained solving equations with variables on both sides. Did Ex 4.2, Q1 to 8. Q6 and Q7 needed help.')}
+      ${area('homework','Homework <em>(optional)</em>',d.homework,2,'Ex 4.2, Q9 to 15')}
+      ${area('notes','Notes for next time <em>(optional)</em>',d.notes,2,'Check homework, then word problems')}
+      ${attachHTML('Files and links <em>(optional)</em>')}`,
+    left: c?`<button type="button" class="btn danger" data-act="delClass" data-id="${c.id}">Delete</button>`:'',
+    cancel: () => w && w.cancel(),
+    onSave: v => {
+      if (w.busy()){ toast('Wait for the upload to finish'); return false; }
+      if (!v.date){ toast('Choose a date'); return false; }
+      if (!v.subject.trim()){ toast('Enter the subject'); return false; }
+      if (!v.did.trim()){ toast('Write what you did in this class'); return false; }
+      const files = w.commit();
+      S.classes[d.id] = {...d, ...v, subject:v.subject.trim(), chapter:v.chapter.trim(), files}; save(); push('putClass', {cls:S.classes[d.id]});
+      toast(c?'Class updated':'Class saved'); render();
+    }});
+  w = attachWire(st, d.files||[]);
+}
+function materialForm(st, m){
+  const d = m || {id:uid(), studentId:st.id, subject: subj || (subjectsOf(st).length===1 ? subjectsOf(st)[0] : ''), chapter:'', type:'Textbook', title:'', notes:'', files:[]};
+  let w;
+  openModal({ title: m?'Edit study material':'Add study material', ok: m?'Save changes':'Save',
+    body: `${subjList(st)}<div class="row">${fld('subject','Subject',d.subject,'text','list="subjs" autocomplete="off"')}${fld('chapter','Chapter <em>(optional)</em>',d.chapter,'text','placeholder="Ch 4, Linear equations"')}</div>
+      <div class="fld"><span>Type</span><div class="seg">${TYPES.map(x=>`<label><input type="radio" name="type" value="${x}" ${d.type===x?'checked':''}>${x}</label>`).join('')}</div></div>
+      ${fld('title','Title <em>(optional)</em>',d.title,'text','placeholder="Textbook chapter PDF"')}
+      ${attachHTML('Files and links')}
+      ${area('notes','Notes <em>(optional)</em>',d.notes,2,'Pages 52 to 60 are the important ones')}`,
+    left: m?`<button type="button" class="btn danger" data-act="delMat" data-id="${m.id}">Delete</button>`:'',
+    cancel: () => w && w.cancel(),
+    onSave: v => {
+      if (w.busy()){ toast('Wait for the upload to finish'); return false; }
+      if (!v.subject.trim()){ toast('Enter the subject'); return false; }
+      if (!w.files().length && !v.title.trim()){ toast('Attach a file or link, or give it a title'); return false; }
+      const files = w.commit();
+      S.materials[d.id] = {...d, ...v, subject:v.subject.trim(), chapter:v.chapter.trim(), title:v.title.trim(), type:v.type||'Other', files};
+      save(); push('putMaterial', {mat:S.materials[d.id]}); toast(m?'Material updated':'Material saved'); render();
+    }});
+  w = attachWire(st, d.files||[]);
+}
+function nextForm(st){
+  const nc = nextClass(st) || {date:today(), time:st.time||''};
+  openModal({ title:'Next class for '+esc(st.name), ok:'Save',
+    body: `<div class="row">${fld('date','Date',nc.date,'date')}${fld('time','Time',nc.time,'time')}</div>
+      <p class="hint">Change this whenever a class moves. Once that class is recorded, it goes back to the usual days.</p>`,
+    left: st.next ? `<button type="button" class="btn ghost" data-act="resetNext" data-id="${st.id}">Use usual days</button>` : '',
+    onSave: v => { if(!v.date){ toast('Choose a date'); return false; }
+      putStudent({...st, next:{date:v.date, time:v.time}}); toast('Next class set'); render(); }});
+}
+function feeForm(st, m){
+  const f = feeInfo(st, m), k = fk(st.id, m);
+  openModal({ title:`${esc(st.name)}, ${fmtMonth(m)} fee`, ok:'Save',
+    body: `<div class="row">${fld('amount','Amount paid (₹)',f.paid||f.due,'number','min="0" step="1" inputmode="numeric"')}${fld('date','Paid on',f.date||today(),'date')}</div>
+      <div class="fld"><span>Paid by</span><div class="seg">${METHODS.map(x=>`<label><input type="radio" name="method" value="${x}" ${(f.method||'UPI')===x?'checked':''}>${x}</label>`).join('')}</div></div>
+      ${fld('due','Fee for this month (₹)',f.due,'number','min="0" step="1" inputmode="numeric"')}
+      ${fld('note','Note <em>(optional)</em>',f.note||'')}`,
+    left: S.fees[k]&&S.fees[k].amount ? `<button type="button" class="btn danger" data-act="unpay" data-id="${k}">Mark not paid</button>` : '',
+    onSave: v => { S.fees[k]={id:k, studentId:st.id, month:m, amount:Number(v.amount||0), date:v.date, method:v.method||'UPI', due:Number(v.due||0), note:v.note};
+      save(); push('putFee', {fee:S.fees[k]}); toast('Fee saved'); render(); }});
+}
+function leftForm(st){
+  openModal({ title:esc(st.name)+' has left', ok:'Save',
+    body: `${fld('leftDate','Last class or leaving date',today(),'date')}
+      <p class="hint">Fees stop after this month. Their classes, materials and fees stay in your records, under past students.</p>`,
+    onSave: v => { if(!v.leftDate){ toast('Choose a date'); return false; } putStudent({...st, leftDate:v.leftDate, next:null}); toast('Moved to past students'); render(); }});
+}
+
+/* ---------- small pieces ---------- */
+const syncBtn = () => `<button class="syncbtn" id="sync" data-act="sync" data-s="${sync.state}"><span class="dot"></span><span>${esc(syncText())}</span></button>`;
+const tabsHTML = (items, cur, act) => `<div class="tabs" role="tablist">${items.map(([k,l])=>`<button role="tab" aria-selected="${cur===k}" data-act="${act}" data-id="${k}">${l}</button>`).join('')}</div>`;
+const chipsHTML = st => { const l=usedSubjects(st); return l.length>1 ? `<div class="chips" role="group" aria-label="Filter by subject"><button class="chip" aria-pressed="${!subj}" data-act="subj" data-id="">All subjects</button>${l.map(x=>`<button class="chip" aria-pressed="${subj.toLowerCase()===x.toLowerCase()}" data-act="subj" data-id="${esc(x)}">${esc(x)}</button>`).join('')}</div>` : ''; };
+const sameSubj = x => !subj || String(x||'').trim().toLowerCase()===subj.toLowerCase();
+
+/* ---------- connect + loading ---------- */
+function viewConnect(){
+  return `<div class="wrap"><section class="hero"><div class="app"><span>Welcome</span></div><h1>My Tuition Classes</h1>
+    <p class="sub">Connect to your Google Sheet so your records are the same on every device.</p></section>
+    <form id="cf" class="panel" novalidate style="display:flex;flex-direction:column;gap:12px">
+      ${fld('url','Web app URL','','url','placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false"')}
+      ${fld('key','Passcode','','password','autocomplete="current-password"')}
+      <p class="err" id="cerr" role="alert"></p>
+      <div><button class="btn primary" type="submit" id="cbtn">Connect</button></div>
+    </form>
+    <p class="hint" style="margin-top:10px">You do this once on each phone or computer. Use the URL from this app’s Apps Script, not the music one, and the passcode you set there.</p></div>`;
+}
+async function connect(e){
+  e.preventDefault();
+  const v = Object.fromEntries(new FormData(e.target)), url = v.url.trim(), key = v.key;
+  const err = $('#cerr'), btn = $('#cbtn');
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/[^/]+\/exec$/.test(url)){ err.textContent='Paste the Web app URL from Apps Script. It starts with https://script.google.com and ends with /exec.'; return; }
+  if (!key){ err.textContent='Enter the passcode you set in Apps Script.'; return; }
+  btn.disabled = true; btn.textContent = 'Connecting…'; err.textContent = '';
+  try {
+    const j = await api('load', {}, {url, key});
+    if (j.data && !('materials' in j.data)) { const er=new Error('That URL belongs to a different app (it looks like the music one). Use the web app URL from your tuition Sheet'); er.server=true; throw er; }
+    cfg = {url, key}; writeJSON(CFG_KEY, cfg); setServerV(j.version);
+    const d = normal(j.data);
+    if (!Object.keys(d.students).length && stuList().length){
+      outbox = [clone({action:'replaceAll', data:S})]; writeJSON(OUT_KEY, outbox);
+      await flush(); toast('Your records were copied to the Google Sheet');
+    } else { S = d; save(); toast('Connected'); }
+    remote = {checked:true, err:''}; render();
+  } catch(ex){
+    err.textContent = !ex.server ? 'Couldn’t reach that web app. Check the URL, and that it’s deployed with access for “Anyone”.'
+      : ex.message==='Wrong passcode' ? 'That passcode doesn’t match the one in Apps Script.' : ex.message+'.';
+    btn.disabled = false; btn.textContent = 'Connect';
+  }
+}
+function viewLoading(){
+  return `<div class="wrap"><section class="hero"><div class="app"><span>My Tuition Classes</span></div><h1>My Tuition Classes</h1>
+    <p class="sub">${remote.err ? '' : 'Loading your records from Google Sheet…'}</p></section>
+    ${remote.err ? `<div class="panel"><p class="err" style="margin-bottom:12px">${esc(remote.err)}</p>
+      <div class="btns"><button class="btn primary" data-act="retry">Try again</button><button class="btn" data-act="disconnect">Change connection</button></div></div>` : ''}</div>`;
+}
+
+/* ---------- home ---------- */
+function stuRow(s){
+  const cm = thisMonth(), n = nextClass(s), f = inMonth(s,cm) ? feeInfo(s,cm) : null, sub = subjectsOf(s);
+  const info = s.leftDate ? 'Left on '+fmtDate(s.leftDate) : n ? 'Next class '+dayLabel(n.date)+(n.time?', '+fmtTime(n.time):'') : 'No class days set';
+  return `<a class="stu" href="#student-${s.id}"><span class="nm">${esc(s.name)}${gradeLine(s)?`<small>${esc(gradeLine(s))}</small>`:''}</span>
+    <span class="info">${sub.length?esc(joinList(sub))+'<br>':''}${info}</span>${f?`<span class="pill ${tone(f.status)}">${f.status}</span>`:''}</a>`;
+}
+function rosterHTML(){
+  const all = stuList(), act = all.filter(s=>!s.leftDate), past = all.filter(s=>s.leftDate);
+  if (!all.length) return `<div class="empty">No students yet. Add each student you teach, then record their classes, study materials and fees.<br><button class="btn primary sm" data-act="addStudent">Add your first student</button></div>`;
+  const w = rq.trim().toLowerCase();
+  const match = s => !w || [s.name, s.grade, s.board, s.school, s.subjects].join(' ').toLowerCase().includes(w);
+  const a = act.filter(match), p = past.filter(match);
+  let h = a.length ? `<div class="list">${a.map(stuRow).join('')}</div>` : `<div class="empty">${w?'No current students match that search.':'No current students.'}</div>`;
+  if (past.length){
+    if (showPast || w) h += p.length ? `<h3 class="more" style="margin-bottom:8px;font-size:1rem">Past students</h3><div class="list">${p.map(stuRow).join('')}</div>` : '';
+    if (!w) h += `<div class="more"><button class="btn ghost sm" data-act="togglePast">${showPast?'Hide past students':'Show past students ('+past.length+')'}</button></div>`;
+  }
+  return h;
+}
+function homeFeesHTML(){
+  const m = feeMonth || thisMonth(), list = stuList().filter(s=>inMonth(s,m));
+  const rows = list.map(s=>({s, f:feeInfo(s,m)}));
+  const collected = rows.reduce((t,r)=>t+r.f.paid,0), pend = rows.reduce((t,r)=>t+r.f.bal,0);
+  const allPend = stuList().reduce((t,s)=>t+pendingOf(s),0);
+  return `<div class="monthnav"><button class="btn sm" data-act="month" data-id="${prevMonth(m)}" aria-label="Previous month">‹</button><h3>${fmtMonth(m)}</h3>
+      <button class="btn sm" data-act="month" data-id="${nextMonth(m)}" aria-label="Next month" ${m>=thisMonth()?'disabled':''}>›</button></div>
+    <div class="total"><span>Collected <strong>${inr(collected)}</strong></span><span>Pending this month <strong style="color:${pend?'var(--red)':'inherit'}">${inr(pend)}</strong></span><span>Pending, all months <strong>${inr(allPend)}</strong></span></div>
+    ${rows.length ? `<div class="list">${rows.map(({s,f})=>`<div class="fee">
+      <a class="m" href="#student-${s.id}">${esc(s.name)}</a>
+      <span class="pill ${tone(f.status)}">${f.status}</span>
+      <span class="info">${f.paid ? `${inr(f.paid)}${f.bal?' of '+inr(f.due):''} on ${fmtDate(f.date)}, ${esc(f.method)}` : inr(f.due)+' due'}</span>
+      <button class="btn sm ${f.paid?'ghost':''}" data-act="fee" data-id="${s.id}" data-m="${m}">${f.paid?'Edit':'Mark as paid'}</button></div>`).join('')}</div>`
+      : `<div class="empty">No students had classes in ${fmtMonth(m)}.</div>`}`;
+}
+function settingsHTML(){
+  return `<div class="panel"><h3 style="margin-bottom:6px">Google Sheet</h3>
+      <p class="muted small" id="syncPanel" style="margin-bottom:10px">${syncPanelInner()}</p>
+      <div class="btns"><button class="btn" data-act="syncNow">Sync now</button><button class="btn ghost danger" data-act="disconnect">Disconnect this device</button></div></div>
+    <div class="panel"><h3 style="margin-bottom:6px">Backup</h3>
+      <p class="muted small" style="margin-bottom:10px">Your records are in your Google Sheet, and files are in your Google Drive. You can also keep a backup file of the records.</p>
+      <div class="btns"><button class="btn" data-act="export">Download backup</button>
+      <label class="btn" style="cursor:pointer">Restore from backup<input type="file" id="imp" accept=".json,application/json" hidden></label></div></div>`;
+}
+function viewHome(){
+  const act = stuList().filter(s=>!s.leftDate), cm = thisMonth(), wk = addDays(today(),6);
+  const up = act.map(s=>({s, n:nextClass(s)})).filter(x=>x.n && x.n.date<=wk)
+    .sort((a,b)=>(a.n.date+(a.n.time||'')).localeCompare(b.n.date+(b.n.time||'')));
+  const fm = act.filter(s=>inMonth(s,cm)).map(s=>feeInfo(s,cm));
+  const got = fm.reduce((t,f)=>t+f.paid,0), due = fm.reduce((t,f)=>t+f.due,0), nPaid = fm.filter(f=>f.status==='Paid').length;
+  return `<div class="wrap">
+    <section class="hero"><div class="app"><span>${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})}</span>${syncBtn()}</div>
+      <h1>My Tuition Classes</h1><p class="sub">${act.length} student${act.length===1?'':'s'}</p></section>
+    ${act.length ? `<div class="cards two">
+      <div class="card"><span class="lbl">Next class for each student</span>
+        ${up.length ? up.slice(0,6).map(({s,n})=>`<a class="upl" href="#student-${s.id}"><span class="d">${dayLabel(n.date)}</span><span class="t">${fmtTime(n.time)}</span><span class="n">${esc(s.name)}</span></a>`).join('')
+          + (up.length>6?`<span class="muted small">and ${up.length-6} more</span>`:'') : '<span class="muted">No classes in the next 7 days.</span>'}</div>
+      <div class="card"><span class="lbl">${fmtMonth(cm)} fees</span>
+        <span class="big">${inr(got)} <span class="muted" style="font-family:var(--body);font-weight:400;font-size:1rem">of ${inr(due)}</span></span>
+        <span class="muted">${nPaid} of ${fm.length} student${fm.length===1?'':'s'} paid</span>
+        <div class="act"><button class="btn sm" data-act="home" data-id="fees">See fees</button></div></div>
+    </div>` : ''}
+    ${tabsHTML([['students','Students'],['fees','Fees'],['settings','Settings']], homeTab, 'home')}
+    <div id="view">${homeTab==='students' ? `<div class="bar"><input type="search" id="rq" placeholder="Search students or subjects" value="${esc(rq)}" aria-label="Search students"><button class="btn primary" data-act="addStudent">+ Add student</button></div><div id="roster">${rosterHTML()}</div>`
+      : homeTab==='fees' ? homeFeesHTML() : settingsHTML()}</div></div>`;
+}
+
+/* ---------- one student: classes ---------- */
+const peek = c => c.chapter || String(c.did||'').split('\n').map(x=>x.trim()).find(Boolean) || '';
+const classFilter = list => { const w=cq.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return list.filter(c=>sameSubj(c.subject) && w.every(x=>[c.subject,c.chapter,c.did,c.homework,c.notes,...(c.files||[]).map(f=>f.name)].join(' ').toLowerCase().includes(x))); };
+function listHTML(st){
+  const all = classesOf(st.id), items = classFilter(all);
+  if (!all.length) return `<div class="empty">No classes yet. After each class, write down the subject, chapter and what you covered.<br><button class="btn primary sm" data-act="addClass" data-id="${st.id}">Add the first class</button></div>`;
+  if (!items.length) return `<div class="empty">No classes match${cq.trim()?' that search':''}${subj?' in '+esc(subj):''}.</div>`;
+  const searching = !!cq.trim();
+  const list = classSort==='old' ? items.slice().reverse() : items;
+  const allOpen = list.every(c=>openC.has(c.id));
+  const head = `<div class="lhead"><span class="muted small">${list.length} class${list.length===1?'':'es'}${searching||subj?' found':''}</span><span class="grow"></span>
+    <button class="btn ghost sm" data-act="sortClasses" data-id="${st.id}" title="Change order">${classSort==='old'?'Oldest first':'Newest first'} ⇅</button>
+    ${searching?'':`<button class="btn ghost sm" data-act="expandAll" data-id="${st.id}">${allOpen?'Collapse all':'Expand all'}</button>`}</div>`;
+  return head + list.map(c=>{ const nf=(c.files||[]).length; return `<details class="entry" data-cid="${c.id}" ${searching||openC.has(c.id)?'open':''}>
+    <summary><span class="tri" aria-hidden="true"></span>
+      <span class="head"><span class="when">${fmtDay(c.date)} <span class="t">${parseD(c.date).getFullYear()}${c.time?', '+fmtTime(c.time):''}</span></span>
+      <span class="peek">${c.subject?esc(c.subject)+': ':''}${esc(peek(c))}</span></span>
+      ${c.homework||nf?`<span class="flags">${c.homework?'<span class="pill">Homework</span>':''}${nf?`<span class="pill">${nf} file${nf===1?'':'s'}</span>`:''}</span>`:''}</summary>
+    <div class="body">
+      ${c.subject||c.chapter?`<p class="sub" style="margin-top:10px">${c.subject?`<span class="pill subj">${esc(c.subject)}</span> `:''}${esc(c.chapter||'')}</p>`:''}
+      <p class="txt">${esc(c.did)}</p>
+      ${c.homework?`<p class="sub"><b>Homework:</b> ${esc(c.homework)}</p>`:''}
+      ${c.notes?`<p class="sub"><b>Next time:</b> ${esc(c.notes)}</p>`:''}
+      ${filesHTML(c.files)}
+      <div class="tools"><button class="btn ghost sm" data-act="editClass" data-id="${c.id}">Edit</button></div>
+    </div>
+  </details>`; }).join('');
+}
+function drawList(st){ const l=$('#list'); if (l) l.innerHTML=listHTML(st); }
+// remember which entries are open, so a re-render (sync, saving) doesn't close them
+document.addEventListener('toggle', e => {
+  const d = e.target; if (!(d instanceof HTMLDetailsElement) || !d.dataset.cid || cq.trim()) return;
+  d.open ? openC.add(d.dataset.cid) : openC.delete(d.dataset.cid);
+  const st = route(), btn = document.querySelector('[data-act="expandAll"]');
+  if (st && btn){ const ids=classFilter(classesOf(st.id)).map(c=>c.id); btn.textContent = ids.every(id=>openC.has(id)) ? 'Collapse all' : 'Expand all'; }
+}, true);
+
+/* ---------- one student: study materials ---------- */
+function matsHTML(st){
+  const all = matsOf(st.id);
+  if (!all.length) return `<div class="empty">Keep textbook chapters, notes, worksheets and question papers here, sorted by subject and chapter.<br><button class="btn primary sm" data-act="addMat" data-id="${st.id}">Add the first material</button></div>`;
+  const w = mq.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const items = all.filter(m=>sameSubj(m.subject) && w.every(x=>[m.subject,m.chapter,m.type,m.title,m.notes,...(m.files||[]).map(f=>f.name)].join(' ').toLowerCase().includes(x)));
+  if (!items.length) return `<div class="empty">No materials match${mq.trim()?' that search':''}${subj?' in '+esc(subj):''}.</div>`;
+  const groups = {}; items.forEach(m=>{ const k=m.subject||'Other'; (groups[k]=groups[k]||[]).push(m); });
+  return Object.entries(groups).map(([g,ms])=>`<h3 class="grp">${esc(g)} <small>${ms.length} item${ms.length===1?'':'s'}</small></h3>
+    ${ms.map(m=>`<article class="mat"><div class="top"><span class="pill">${esc(m.type||'Other')}</span><span class="ttl">${esc(matTitle(m))}</span>${m.chapter?`<span class="ch">${esc(m.chapter)}</span>`:''}
+      <button class="btn ghost sm" data-act="editMat" data-id="${m.id}">Edit</button></div>
+      ${filesHTML(m.files)}${m.notes?`<p class="nt">${esc(m.notes)}</p>`:''}</article>`).join('')}`).join('');
+}
+
+/* ---------- one student: fees + details ---------- */
+function stuFeesHTML(st){
+  const ms = monthsOf(st).map(m=>feeInfo(st,m));
+  const collected = ms.reduce((s,m)=>s+m.paid,0), pending = ms.reduce((s,m)=>s+m.bal,0);
+  return `<div class="total"><span>Collected <strong>${inr(collected)}</strong></span><span>Pending <strong style="color:${pending?'var(--red)':'inherit'}">${inr(pending)}</strong></span></div>
+    <div class="list">${ms.map(m=>`<div class="fee">
+      <span class="m">${fmtMonth(m.month)}</span>
+      <span class="pill ${tone(m.status)}">${m.status}</span>
+      <span class="info">${m.paid ? `${inr(m.paid)}${m.bal?' of '+inr(m.due):''} on ${fmtDate(m.date)}, ${esc(m.method)}${m.note?'. '+esc(m.note):''}` : inr(m.due)+' due'}</span>
+      <button class="btn sm ${m.paid?'ghost':''}" data-act="fee" data-id="${st.id}" data-m="${m.month}">${m.paid?'Edit':'Mark as paid'}</button>
+    </div>`).join('')}</div>`;
+}
+const tel = p => p ? `<a href="tel:${esc(p)}" style="color:inherit">${esc(p)}</a>` : '—';
+function stuDetailsHTML(st){
+  return `<div class="panel"><dl>
+      <dt>Name</dt><dd>${esc(st.name)}</dd>
+      <dt>Class</dt><dd>${esc(st.grade||'—')}</dd>
+      <dt>Board</dt><dd>${esc(st.board||'—')}</dd>
+      ${st.school?`<dt>School</dt><dd>${esc(st.school)}</dd>`:''}
+      <dt>Subjects</dt><dd>${esc(joinList(subjectsOf(st))||'—')}</dd>
+      ${st.guardian?`<dt>Parent or guardian</dt><dd>${esc(st.guardian)}</dd>`:''}
+      <dt>Parent’s phone</dt><dd>${tel(st.guardianPhone)}</dd>
+      <dt>Student’s phone</dt><dd>${tel(st.phone)}</dd>
+      <dt>Joined on</dt><dd>${fmtDate(st.joinDate)}</dd>
+      ${st.leftDate?`<dt>Left on</dt><dd>${fmtDate(st.leftDate)}</dd>`:''}
+      <dt>Monthly fee</dt><dd>${inr(st.fee)}</dd>
+      <dt>Usual classes</dt><dd>${esc(usual(st))}</dd>
+      <dt>Classes so far</dt><dd>${classesOf(st.id).length}</dd>
+      ${st.notes?`<dt>Notes</dt><dd style="font-weight:400">${esc(st.notes)}</dd>`:''}
+    </dl><div class="btns" style="margin-top:14px"><button class="btn" data-act="editStudent" data-id="${st.id}">Edit details</button>
+      ${st.leftDate ? `<button class="btn" data-act="rejoin" data-id="${st.id}">Rejoined</button>` : `<button class="btn" data-act="left" data-id="${st.id}">Student has left</button>`}
+      <span class="grow"></span><button class="btn ghost danger" data-act="delStudent" data-id="${st.id}">Delete student</button></div></div>`;
+}
+function viewStudent(st){
+  const nc=nextClass(st), all=classesOf(st.id), last=all[0], cm=thisMonth(), showFee=inMonth(st,cm), f=feeInfo(st,cm);
+  const due = nc && nc.date<=today(), nm = matsOf(st.id).length;
+  const view = stuTab==='classes' ? `${chipsHTML(st)}<div class="bar"><input type="search" id="cq" placeholder="Search ${esc(st.name)}’s classes" value="${esc(cq)}" aria-label="Search classes"><button class="btn primary" data-act="addClass" data-id="${st.id}">+ Add class</button></div>
+      <div id="list">${listHTML(st)}</div>`
+    : stuTab==='materials' ? `${chipsHTML(st)}<div class="bar"><input type="search" id="mq" placeholder="Search materials" value="${esc(mq)}" aria-label="Search materials"><button class="btn primary" data-act="addMat" data-id="${st.id}">+ Add material</button></div>
+      <div id="mlist">${matsHTML(st)}</div>`
+    : stuTab==='fees' ? stuFeesHTML(st) : stuDetailsHTML(st);
+  return `<div class="wrap">
+    <section class="hero"><div class="app"><a href="#" class="back">‹ All students</a>${syncBtn()}</div>
+      <h1>${esc(st.name)}</h1><p class="sub">${esc([gradeLine(st), joinList(subjectsOf(st))].filter(Boolean).join('. ')||'Tuition')}. ${st.leftDate ? 'Left on '+fmtDate(st.leftDate)+'.' : esc(usual(st))+'.'}</p></section>
+    <div class="cards">
+      <div class="card"><span class="lbl">Next class</span>
+        <span class="big">${st.leftDate?'—':nc?dayLabel(nc.date):'Not set'}</span><span class="muted">${nc&&nc.time?fmtTime(nc.time):''}${nc&&nc.custom?' (changed)':''}</span>
+        ${st.leftDate?'':`<div class="act"><button class="btn sm" data-act="next" data-id="${st.id}">Change</button>${due?`<button class="btn sm primary" data-act="addClass" data-id="${st.id}">Add class</button>`:''}</div>`}</div>
+      <div class="card"><span class="lbl">${showFee?fmtMonth(cm)+' fee':'Fees'}</span>
+        ${showFee ? `<span class="big"><span class="pill ${tone(f.status)}" style="font-size:.95rem">${f.status}</span></span>
+          <span class="muted">${f.paid?inr(f.paid)+' on '+fmtDate(f.date):inr(f.due)+' due'}</span>
+          <div class="act"><button class="btn sm ${f.status==='Paid'?'':'primary'}" data-act="fee" data-id="${st.id}" data-m="${cm}">${f.paid?'Edit':'Mark as paid'}</button></div>`
+          : `<span class="big">${inr(pendingOf(st))}</span><span class="muted">pending</span>`}</div>
+      <div class="card"><span class="lbl">Last class</span>
+        <span class="big">${last?fmtDay(last.date):'None yet'}</span>${last?`<span class="clip">${esc([last.subject,last.chapter].filter(Boolean).join(': ')||last.did)}</span>`:''}
+        <div class="act"><button class="btn sm ${due?'':'primary'}" data-act="addClass" data-id="${st.id}">+ Add class</button></div></div>
+    </div>
+    ${tabsHTML([['classes','Classes'],['materials','Materials'+(nm?' ('+nm+')':'')],['fees','Fees'],['details','Details']], stuTab, 'stab')}
+    <div id="view">${view}</div></div>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  load.done || (load(), load.done=true);
+  const app=$('#app');
+  if (!cfg){ app.innerHTML=viewConnect(); $('#cf').onsubmit=connect; return; }
+  if (!stuList().length && !remote.checked){ app.innerHTML=viewLoading(); return; }
+  const st = route();
+  if (!st && location.hash.startsWith('#student-')) history.replaceState(null,'',location.pathname+location.search);
+  app.innerHTML = st ? viewStudent(st) : viewHome();
+  const r=$('#rq'); if (r) r.oninput = e => { rq=e.target.value; $('#roster').innerHTML=rosterHTML(); };
+  const c=$('#cq'); if (c) c.oninput = e => { cq=e.target.value; drawList(st); };
+  const m=$('#mq'); if (m) m.oninput = e => { mq=e.target.value; $('#mlist').innerHTML=matsHTML(st); };
+  const imp=$('#imp'); if (imp) imp.onchange = restore;
+}
+
+/* ---------- actions ---------- */
+const stu = d => S.students[d.id];
+const A = {
+  close,
+  home: d => { homeTab=d.id; render(); },
+  stab: d => { stuTab=d.id; render(); },
+  subj: d => { subj=d.id; render(); },
+  month: d => { feeMonth=d.id; render(); },
+  togglePast: () => { showPast=!showPast; $('#roster').innerHTML=rosterHTML(); },
+  sortClasses: d => { classSort = classSort==='old' ? 'new' : 'old'; writeJSON(SORT_KEY, classSort); drawList(stu(d)); },
+  expandAll: d => {
+    const ids = classFilter(classesOf(d.id)).map(c=>c.id);
+    if (ids.every(id=>openC.has(id))) ids.forEach(id=>openC.delete(id)); else ids.forEach(id=>openC.add(id));
+    drawList(stu(d));
+  },
+  addStudent: () => studentForm(null),
+  editStudent: d => studentForm(stu(d)),
+  left: d => leftForm(stu(d)),
+  rejoin: d => { putStudent({...stu(d), leftDate:''}); toast('Back in current students'); render(); },
+  delStudent: d => {
+    const st=stu(d), nc=classesOf(st.id).length, nm=matsOf(st.id).length;
+    confirmBox(`Delete <b>${esc(st.name)}</b>${nc?`, their ${nc} class record${nc===1?'':'s'}`:''}${nm?`, ${nm} study material${nm===1?'':'s'}`:''} and fee records? This can’t be undone. Files stay in your Drive folder. If they’ve just stopped coming, use “Student has left” instead.`, 'Delete student', ()=>{
+      Object.values(S.classes).forEach(c=>{ if(c.studentId===st.id) delete S.classes[c.id]; });
+      Object.values(S.materials).forEach(m=>{ if(m.studentId===st.id) delete S.materials[m.id]; });
+      Object.values(S.fees).forEach(f=>{ if(f.studentId===st.id) delete S.fees[f.id]; });
+      delete S.students[st.id]; save(); push('delStudent', {id:st.id}); toast(st.name+' deleted'); location.hash='';
+    });
+  },
+  addClass: d => classForm(stu(d), null),
+  editClass: d => { const c=S.classes[d.id]; classForm(S.students[c.studentId], c); },
+  delClass: d => { close(); confirmBox('Delete this class record? Its files stay in your Drive folder.', 'Delete', ()=>{ delete S.classes[d.id]; openC.delete(d.id); save(); push('delClass', {id:d.id}); toast('Class deleted'); render(); }); },
+  addMat: d => materialForm(stu(d), null),
+  editMat: d => { const m=S.materials[d.id]; materialForm(S.students[m.studentId], m); },
+  delMat: d => { close(); confirmBox('Delete this study material? Its files stay in your Drive folder.', 'Delete', ()=>{ delete S.materials[d.id]; save(); push('delMaterial', {id:d.id}); toast('Material deleted'); render(); }); },
+  next: d => nextForm(stu(d)),
+  resetNext: d => { putStudent({...stu(d), next:null}); close(); toast('Back to the usual days'); render(); },
+  fee: d => feeForm(stu(d), d.m),
+  unpay: d => { const f=S.fees[d.id]; close(); confirmBox('Mark '+fmtMonth(f.month)+' as not paid?', 'Mark not paid', ()=>{ delete S.fees[d.id]; save(); push('delFee', {id:d.id}); render(); }); },
+  sync: () => {
+    if (sync.state==='error'){
+      openModal({title:'Not saving to the sheet', body:`<p>${esc(sync.msg)}.</p><p class="hint" style="margin-top:8px">Your changes are kept on this device and will be sent once this is fixed.</p>`,
+        left:`<button type="button" class="btn" data-act="syncNow">Try again</button>`});
+    } else { refresh(); }
+  },
+  syncNow: () => { close(); toast('Syncing…'); refresh(); },
+  retry: () => { remote.err=''; render(); refresh(); },
+  disconnect: () => {
+    const n = outbox.length;
+    confirmBox('Disconnect this device? Your records stay in the Google Sheet.'+(n?` <b>${n} change${n===1?'':'s'} not yet saved to the sheet will be lost.</b>`:''), 'Disconnect', ()=>{
+      cfg=null; writeJSON(CFG_KEY, null); outbox=[]; writeJSON(OUT_KEY, outbox);
+      S=EMPTY(); save(); remote={checked:false, err:''}; setSync('ok'); location.hash=''; render();
+    });
+  },
+  export: () => {
+    const blob=new Blob([JSON.stringify({app:'my-tuition', version:1, ...S},null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tuition-backup-'+today()+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000); toast('Backup downloaded');
+  }
+};
+function restore(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{ let d; try{ d=JSON.parse(r.result); }catch(err){ toast('That file isn’t a backup'); return; }
+    if (!d || d.app!=='my-tuition'){ toast(d && /^my-music-studio/.test(d.app||'') ? 'That’s a music studio backup. Restore it in the music app.' : 'That file isn’t a tuition backup'); return; }
+    const data = normal(d);
+    confirmBox('Replace everything in the Google Sheet with this backup?', 'Restore', ()=>{ S=data; save(); push('replaceAll', {data:S}); toast('Backup restored'); location.hash=''; render(); }); };
+  r.readAsText(file); e.target.value='';
+}
+document.addEventListener('click', e => { const el=e.target.closest('[data-act]'); if(!el||!A[el.dataset.act]) return; e.preventDefault(); A[el.dataset.act](el.dataset); });
+
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+window.addEventListener('online', refresh);
+setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+
+render();
+refresh();
+</script>
+</body>
+</html>
