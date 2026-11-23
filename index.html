@@ -132,6 +132,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .entry .sub{margin-top:8px;font-size:.93rem;white-space:pre-wrap}
 .entry .sub b{color:var(--muted)}
 .tools{display:flex;gap:4px;margin-top:8px;margin-left:-8px}
+.pview+.pview{border-top:1px dashed var(--line);margin-top:12px}
+/* subjects inside one class, in the form */
+.parts{display:flex;flex-direction:column;gap:10px;counter-reset:part}
+.part{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;counter-increment:part}
+.part:only-child{border:0;padding:0}
+.part:only-child .phead{display:none}
+.phead{display:flex;align-items:center;justify-content:space-between}
+.pnum{font-weight:700;font-size:.88rem;color:var(--accent)}
+.pnum::after{content:" " counter(part)}
 
 /* study materials */
 .grp{font-size:1.05rem;margin:18px 0 8px;display:flex;align-items:baseline;gap:8px}
@@ -353,7 +362,18 @@ const matsOf = id => Object.values(S.materials).filter(m=>m.studentId===id)
   .sort((a,b)=>natural(a.subject,b.subject) || natural(a.chapter,b.chapter) || TYPES.indexOf(a.type)-TYPES.indexOf(b.type) || natural(matTitle(a),matTitle(b)));
 const daysOf = st => (Array.isArray(st.days) ? st.days : String(st.days??'').split(',')).filter(x=>x!==''&&x!=null).map(Number);
 const subjectsOf = st => uniq(String(st.subjects||'').split(',').map(x=>x.trim()));
-const usedSubjects = st => uniq([...subjectsOf(st), ...classesOf(st.id).map(c=>c.subject), ...matsOf(st.id).map(m=>m.subject)].map(x=>String(x||'').trim()));
+const usedSubjects = st => uniq([...subjectsOf(st), ...classesOf(st.id).flatMap(c=>partsOf(c).map(p=>p.subject)), ...matsOf(st.id).map(m=>m.subject)].map(x=>String(x||'').trim()));
+const firstLine = t => String(t||'').split('\n').map(x=>x.trim()).find(Boolean) || '';
+const partsOf = c => Array.isArray(c.parts) && c.parts.length ? c.parts
+  : [{subject:c.subject||'', chapter:c.chapter||'', did:c.did||'', homework:c.homework||''}];
+/* Flat copies for the readable Subject / Chapter / Did / Homework columns in the sheet. */
+function flatten(parts){
+  if (parts.length===1){ const p=parts[0]; return {subject:p.subject, chapter:p.chapter, did:p.did, homework:p.homework}; }
+  return { subject: uniq(parts.map(p=>p.subject)).join(', '),
+    chapter: parts.filter(p=>p.chapter).map(p=>p.subject+': '+p.chapter).join('; '),
+    did: parts.map(p=>p.subject+(p.chapter?' ('+p.chapter+')':'')+'\n'+p.did).join('\n\n'),
+    homework: parts.filter(p=>p.homework).map(p=>p.subject+': '+p.homework).join('\n') };
+}
 const matTitle = m => m.title || (m.files&&m.files[0]&&m.files[0].name) || m.type || 'Material';
 const hasClassOn = (id,d) => Object.values(S.classes).some(c=>c.studentId===id && c.date===d);
 function nextClass(st){
@@ -421,7 +441,8 @@ function attachWire(st, orig){
       if (file.size > MAX_FILE){ toast(file.name+' is over 10 MB. Add it to Drive and use “Add a link”.'); return; }
       up.push(file.name); draw();
       try {
-        const sj = ($('#mf [name="subject"]')||{}).value || '';
+        const sjs = uniq([...document.querySelectorAll('#mf [name="subject"], #mf [data-f="subject"]')].map(i=>i.value.trim()));
+        const sj = sjs.length===1 ? sjs[0] : '';
         const j = await api('upload', {studentId:st.id, subject:sj.trim(), name:file.name, mime:file.type||'application/octet-stream', data:await readB64(file)});
         if (gone){ push('delFile',{fileId:j.file.id}); return; }
         files.push(j.file); fresh.push(j.file);
@@ -498,16 +519,21 @@ function studentForm(st){
       else { toast(rec.name+' added'); location.hash='student-'+rec.id; }
     }});
 }
+const partHTML = p => `<div class="part"><div class="phead"><span class="pnum">Subject</span><button type="button" class="btn ghost sm danger" data-rmpart>Remove</button></div>
+  <div class="row"><label class="fld"><span>Subject</span><input data-f="subject" list="subjs" autocomplete="off" value="${esc(p.subject)}"></label>
+    <label class="fld"><span>Chapter or topic <em>(optional)</em></span><input data-f="chapter" value="${esc(p.chapter)}" placeholder="Ch 4, Linear equations"></label></div>
+  <label class="fld"><span>What we did</span><textarea data-f="did" rows="5" placeholder="Explained solving equations with variables on both sides. Did Ex 4.2, Q1 to 8.">${esc(p.did)}</textarea></label>
+  <label class="fld"><span>Homework <em>(optional)</em></span><textarea data-f="homework" rows="2" placeholder="Ex 4.2, Q9 to 15">${esc(p.homework)}</textarea></label></div>`;
 function classForm(st, c){
   const nc = nextClass(st), prev = classesOf(st.id)[0];
-  const d = c || {id:uid(), studentId:st.id, date:today(), time:(nc && nc.date===today() ? nc.time : st.time) || '',
-    subject: subj || (subjectsOf(st).length===1 ? subjectsOf(st)[0] : prev?.subject) || '', chapter:'', did:'', homework:'', notes:'', files:[]};
+  const first = subj || (subjectsOf(st).length===1 ? subjectsOf(st)[0] : prev ? partsOf(prev)[0].subject : '') || '';
+  const d = c || {id:uid(), studentId:st.id, date:today(), time:(nc && nc.date===today() ? nc.time : st.time) || '', notes:'', files:[]};
+  const parts0 = c ? partsOf(c) : [{subject:first, chapter:'', did:'', homework:''}];
   let w;
   openModal({ title: c?'Edit class':'Add a class for '+esc(st.name), ok: c?'Save changes':'Save class',
     body: `${subjList(st)}<div class="row">${fld('date','Date',d.date,'date')}${fld('time','Time',d.time,'time')}</div>
-      <div class="row">${fld('subject','Subject',d.subject,'text','list="subjs" autocomplete="off"')}${fld('chapter','Chapter or topic <em>(optional)</em>',d.chapter,'text','placeholder="Ch 4, Linear equations"')}</div>
-      ${area('did','What we did',d.did,6,'Explained solving equations with variables on both sides. Did Ex 4.2, Q1 to 8. Q6 and Q7 needed help.')}
-      ${area('homework','Homework <em>(optional)</em>',d.homework,2,'Ex 4.2, Q9 to 15')}
+      <div class="parts" id="parts">${parts0.map(partHTML).join('')}</div>
+      <div><button type="button" class="btn sm" id="addpart">+ Add another subject</button></div>
       ${area('notes','Notes for next time <em>(optional)</em>',d.notes,2,'Check homework, then word problems')}
       ${attachHTML('Files and links <em>(optional)</em>')}`,
     left: c?`<button type="button" class="btn danger" data-act="delClass" data-id="${c.id}">Delete</button>`:'',
@@ -515,12 +541,21 @@ function classForm(st, c){
     onSave: v => {
       if (w.busy()){ toast('Wait for the upload to finish'); return false; }
       if (!v.date){ toast('Choose a date'); return false; }
-      if (!v.subject.trim()){ toast('Enter the subject'); return false; }
-      if (!v.did.trim()){ toast('Write what you did in this class'); return false; }
+      const parts = [...document.querySelectorAll('#parts .part')].map(b=>{ const g=k=>b.querySelector(`[data-f="${k}"]`).value.trim();
+        return {subject:g('subject'), chapter:g('chapter'), did:g('did'), homework:g('homework')}; }).filter(p=>p.subject||p.chapter||p.did||p.homework);
+      if (!parts.length){ toast('Write what you did in this class'); return false; }
+      for (const p of parts){
+        if (!p.subject){ toast('Enter the subject for each part'); return false; }
+        if (!p.did){ toast('Write what you did in '+p.subject); return false; }
+      }
       const files = w.commit();
-      S.classes[d.id] = {...d, ...v, subject:v.subject.trim(), chapter:v.chapter.trim(), files}; save(); push('putClass', {cls:S.classes[d.id]});
+      S.classes[d.id] = {id:d.id, studentId:st.id, date:v.date, time:v.time, notes:v.notes, parts, ...flatten(parts), files};
+      save(); push('putClass', {cls:S.classes[d.id]});
       toast(c?'Class updated':'Class saved'); render();
     }});
+  const box = $('#parts');
+  $('#addpart').onclick = () => { box.insertAdjacentHTML('beforeend', partHTML({subject:'',chapter:'',did:'',homework:''})); box.lastElementChild.querySelector('input').focus(); };
+  box.onclick = e => { const b=e.target.closest('[data-rmpart]'); if (b && box.children.length>1) b.closest('.part').remove(); };
   w = attachWire(st, d.files||[]);
 }
 function materialForm(st, m){
@@ -687,12 +722,14 @@ function viewHome(){
 }
 
 /* ---------- one student: classes ---------- */
-const peek = c => c.chapter || String(c.did||'').split('\n').map(x=>x.trim()).find(Boolean) || '';
+const peek = c => { const ps=partsOf(c);
+  if (ps.length>1) return ps.map(p=>p.subject+(p.chapter?' ('+p.chapter+')':'')).join(', ');
+  const p=ps[0]; return (p.subject?p.subject+': ':'')+(p.chapter||firstLine(p.did)); };
 const classFilter = list => { const w=cq.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  return list.filter(c=>sameSubj(c.subject) && w.every(x=>[c.subject,c.chapter,c.did,c.homework,c.notes,...(c.files||[]).map(f=>f.name)].join(' ').toLowerCase().includes(x))); };
+  return list.filter(c=>partsOf(c).some(p=>sameSubj(p.subject)) && w.every(x=>[c.subject,c.chapter,c.did,c.homework,c.notes,...(c.files||[]).map(f=>f.name)].join(' ').toLowerCase().includes(x))); };
 function listHTML(st){
   const all = classesOf(st.id), items = classFilter(all);
-  if (!all.length) return `<div class="empty">No classes yet. After each class, write down the subject, chapter and what you covered.<br><button class="btn primary sm" data-act="addClass" data-id="${st.id}">Add the first class</button></div>`;
+  if (!all.length) return `<div class="empty">No classes yet. After each class, write down what you covered in each subject.<br><button class="btn primary sm" data-act="addClass" data-id="${st.id}">Add the first class</button></div>`;
   if (!items.length) return `<div class="empty">No classes match${cq.trim()?' that search':''}${subj?' in '+esc(subj):''}.</div>`;
   const searching = !!cq.trim();
   const list = classSort==='old' ? items.slice().reverse() : items;
@@ -703,12 +740,12 @@ function listHTML(st){
   return head + list.map(c=>{ const nf=(c.files||[]).length; return `<details class="entry" data-cid="${c.id}" ${searching||openC.has(c.id)?'open':''}>
     <summary><span class="tri" aria-hidden="true"></span>
       <span class="head"><span class="when">${fmtDay(c.date)} <span class="t">${parseD(c.date).getFullYear()}${c.time?', '+fmtTime(c.time):''}</span></span>
-      <span class="peek">${c.subject?esc(c.subject)+': ':''}${esc(peek(c))}</span></span>
+      <span class="peek">${esc(peek(c))}</span></span>
       ${c.homework||nf?`<span class="flags">${c.homework?'<span class="pill">Homework</span>':''}${nf?`<span class="pill">${nf} file${nf===1?'':'s'}</span>`:''}</span>`:''}</summary>
     <div class="body">
-      ${c.subject||c.chapter?`<p class="sub" style="margin-top:10px">${c.subject?`<span class="pill subj">${esc(c.subject)}</span> `:''}${esc(c.chapter||'')}</p>`:''}
-      <p class="txt">${esc(c.did)}</p>
-      ${c.homework?`<p class="sub"><b>Homework:</b> ${esc(c.homework)}</p>`:''}
+      ${partsOf(c).map(p=>`<div class="pview">${p.subject||p.chapter?`<p class="sub" style="margin-top:10px">${p.subject?`<span class="pill subj">${esc(p.subject)}</span> `:''}${esc(p.chapter||'')}</p>`:''}
+        <p class="txt">${esc(p.did)}</p>
+        ${p.homework?`<p class="sub"><b>Homework:</b> ${esc(p.homework)}</p>`:''}</div>`).join('')}
       ${c.notes?`<p class="sub"><b>Next time:</b> ${esc(c.notes)}</p>`:''}
       ${filesHTML(c.files)}
       <div class="tools"><button class="btn ghost sm" data-act="editClass" data-id="${c.id}">Edit</button></div>
@@ -792,7 +829,7 @@ function viewStudent(st){
           <div class="act"><button class="btn sm ${f.status==='Paid'?'':'primary'}" data-act="fee" data-id="${st.id}" data-m="${cm}">${f.paid?'Edit':'Mark as paid'}</button></div>`
           : `<span class="big">${inr(pendingOf(st))}</span><span class="muted">pending</span>`}</div>
       <div class="card"><span class="lbl">Last class</span>
-        <span class="big">${last?fmtDay(last.date):'None yet'}</span>${last?`<span class="clip">${esc([last.subject,last.chapter].filter(Boolean).join(': ')||last.did)}</span>`:''}
+        <span class="big">${last?fmtDay(last.date):'None yet'}</span>${last?`<span class="clip">${esc(peek(last))}</span>`:''}
         <div class="act"><button class="btn sm ${due?'':'primary'}" data-act="addClass" data-id="${st.id}">+ Add class</button></div></div>
     </div>
     ${tabsHTML([['classes','Classes'],['materials','Materials'+(nm?' ('+nm+')':'')],['fees','Fees'],['details','Details']], stuTab, 'stab')}
